@@ -1,0 +1,898 @@
+<html>
+<title>Life</title>
+
+<!-- Mirrored from cellaris.wiki/wp-content/uploads/2024/12/cellarismobile.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 06 Dec 2024 22:52:41 GMT -->
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    :root {
+        --canvas-bg-color: #000000;
+        --neon-green: #00FF00;
+        --hacker-font: "Courier New", monospace;
+    }
+
+    body {
+        font-family: var(--hacker-font);
+        background-color: #000000;
+        color: var(--neon-green);
+        text-shadow: 0 0 5px var(--neon-green);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+        margin: 0;
+        padding: 0;
+    }
+
+    button, input[type="range"], select {
+        background-color: #000000;
+        border: 1px solid var(--neon-green);
+        color: var(--neon-green);
+        font-family: var(--hacker-font);
+        padding: 10px;
+        text-transform: uppercase;
+        text-shadow: 0 0 5px var(--neon-green);
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+        box-shadow: 0 0 10px var(--neon-green);
+        margin: 5px;
+    }
+
+    button:hover, input[type="range"]:hover, select:hover {
+        background-color: var(--neon-green);
+        color: #000000;
+        box-shadow: 0 0 20px var(--neon-green);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        background-color: var(--neon-green);
+        border: 1px solid #000000;
+        width: 15px;
+        height: 15px;
+        cursor: pointer;
+    }
+
+    canvas {
+        border: 2px dashed var(--neon-green);
+        box-shadow: 0 0 20px var(--neon-green);
+        margin-top: 20px;
+    }
+
+    #status-message {
+        margin-top: 20px;
+        color: var(--neon-green);
+        font-family: var(--hacker-font);
+        text-shadow: 0 0 5px var(--neon-green);
+        border-top: 1px solid var(--neon-green);
+        padding-top: 10px;
+        width: 90%;
+        max-width: 1000px;
+        font-size: 0.9rem;
+        overflow: hidden;
+        text-align: left;
+    }
+
+    #status-message p {
+        margin: 5px 0;
+        padding: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    /* Enhanced styling for the lil-gui controls */
+    .lil-gui {
+        --gui-bg-color: #000000;
+        --gui-text-color: var(--neon-green);
+        --gui-border-color: var(--neon-green);
+        --gui-highlight-color: #00ff66;
+        --gui-shadow: 0 0 10px var(--neon-green);
+        font-family: var(--hacker-font);
+        border: 1px solid var(--gui-border-color);
+        background-color: var(--gui-bg-color);
+        color: var(--gui-text-color);
+        text-shadow: 0 0 5px var(--gui-text-color);
+        box-shadow: var(--gui-shadow);
+    }
+
+    .lil-gui .title, 
+    .lil-gui .controller label, 
+    .lil-gui .controller select, 
+    .lil-gui .controller input[type=text] {
+        color: var(--gui-text-color);
+        font-family: var(--hacker-font);
+        text-shadow: 0 0 3px var(--gui-text-color);
+    }
+
+    .lil-gui .title {
+        background: linear-gradient(to right, var(--gui-highlight-color), transparent);
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--gui-border-color);
+        padding: 5px;
+    }
+
+    .lil-gui .folder > .title {
+        cursor: pointer;
+        transition: color 0.3s, background 0.3s;
+    }
+
+    .lil-gui .folder > .title:hover {
+        background: linear-gradient(to right, var(--gui-border-color), transparent);
+        box-shadow: 0 0 15px var(--gui-border-color);
+    }
+
+    .lil-gui .controller {
+        position: relative;
+        padding: 5px;
+        border-bottom: 1px dashed var(--gui-border-color);
+        transition: background-color 0.3s;
+    }
+
+    .lil-gui .controller:hover {
+        background-color: rgba(0,255,0,0.1);
+    }
+
+    .lil-gui .controller select,
+    .lil-gui .controller input[type=text] {
+        background-color: #000000;
+        border: 1px solid var(--gui-border-color);
+        color: var(--gui-text-color);
+        box-shadow: 0 0 5px var(--gui-border-color);
+        padding: 3px;
+        text-transform: uppercase;
+        transition: box-shadow 0.3s;
+    }
+
+    .lil-gui .controller select:hover,
+    .lil-gui .controller input[type=text]:hover {
+        box-shadow: 0 0 10px var(--gui-highlight-color);
+    }
+
+    .lil-gui .controller input[type=checkbox] {
+        accent-color: var(--gui-highlight-color);
+        width: 15px;
+        height: 15px;
+        cursor: pointer;
+        margin-right: 5px;
+        box-shadow: 0 0 5px var(--gui-border-color);
+    }
+
+    .lil-gui .controller input[type=checkbox]:hover {
+        box-shadow: 0 0 10px var(--gui-highlight-color);
+    }
+
+    .lil-gui .controller input[type=range] {
+        -webkit-appearance: none;
+        width: 100%;
+        background: transparent;
+        cursor: pointer;
+    }
+
+    .lil-gui .controller input[type=range]::-webkit-slider-runnable-track {
+        background: linear-gradient(to right, var(--gui-border-color), #000000);
+        height: 4px;
+        box-shadow: 0 0 5px var(--gui-border-color);
+    }
+
+    .lil-gui .controller input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        background-color: var(--gui-highlight-color);
+        border: 1px solid #000000;
+        width: 15px;
+        height: 15px;
+        cursor: pointer;
+        box-shadow: 0 0 5px var(--gui-border-color);
+    }
+
+    .lil-gui .close-button {
+        background: #000000;
+        border: 1px solid var(--gui-border-color);
+        color: var(--gui-text-color);
+        text-shadow: 0 0 3px var(--gui-text-color);
+        cursor: pointer;
+        padding: 5px;
+        text-transform: uppercase;
+        box-shadow: 0 0 5px var(--gui-border-color);
+    }
+
+    .lil-gui .close-button:hover {
+        background: var(--gui-highlight-color);
+        color: #000000;
+        box-shadow: 0 0 10px var(--gui-highlight-color);
+    }
+
+    /* Make the "Cellaris Generate" button more prominent */
+    .lil-gui .folder:nth-of-type(1) .controller:nth-of-type(2) button {
+        font-size: 1.2em;
+        padding: 12px 20px;
+        border: 2px solid var(--neon-green);
+        animation: glow-pulse 2s infinite alternate;
+        font-weight: bold;
+    }
+
+    @keyframes glow-pulse {
+        0% { box-shadow: 0 0 10px var(--neon-green); }
+        100% { box-shadow: 0 0 25px var(--neon-green), inset 0 0 10px var(--neon-green); background-color: var(--neon-green); color: #000;}
+    }
+</style>
+</head>
+
+<body>
+    <canvas id="canvas" tabindex="1"></canvas>
+    <div id="status-message"><p>Status: Artificial life active</p></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.17"></script>
+    <script>
+        /* Code is the same except for the starting count parameter changed from 500 to 100 */
+
+        const maxRadius = 200;
+        const maxClusters = 20;
+        const minClusterSize = 50;
+        const predefinedColors = ['green', 'red', 'orange', 'cyan', 'magenta', 'lavender', 'teal'];
+
+        const initializationMessages = [
+            "Initializing particle interaction matrix... aligning emergent vectors.",
+            "Compiling modular rule sets... optimizing for emergent intelligence.",
+            "Activating neural lattice... cross-referencing adaptive patterns.",
+            "Seeding environment parameters... enabling dynamic diversity.",
+            "Loading Noogenesis framework... preparing for adaptive evolution.",
+            "Deploying dynamic learning modules... initializing cellular autonomy.",
+            "Initializing entropy flow analysis... calibrating system-wide coherence.",
+            "Tuning environment parameters... fostering adaptive behaviors."
+        ];
+
+        const trackingClustersMessages = [
+            "Tracking agent persistence... measuring resilience against perturbations.",
+            "Monitoring multi-agent interactions... generating collective intelligence map.",
+            "Analyzing agent-environment feedback loops... calculating adaptive responses.",
+            "Logging ecosystem parameters... balancing interaction weights.",
+            "Testing attractor stability... logging pattern retention rates.",
+            "Projecting ecological interdependencies... mapping emergent ecosystems.",
+            "Conducting multi-scale perturbation tests... measuring cognitive thresholds.",
+            "Evaluating autopoietic systems... monitoring life cycle completions."
+        ];
+
+        const drawLinesMessages = [
+            "Drawing spatiotemporal dynamics... isolating precursors to agency.",
+            "Mapping energy flux distributions... stabilizing emergent entities.",
+            "Graphing adaptive heuristics... tracking goal-oriented behaviors.",
+            "Visualizing information flow between agents... detecting communication signals.",
+            "Modeling ecosystem feedback loops... rendering network interdependencies.",
+            "Plotting neural lattice pathways... observing adaptive growth.",
+            "Rendering agent cluster interactions... highlighting dominant patterns.",
+            "Tracing emergent cognition pathways... illustrating behavior thresholds."
+        ];
+
+        const defaultStatus = "Status: Artificial life active";
+        let messageTimeout = null;
+
+        const settings = {
+            seed: 91651088029,
+            fps: 0,
+            atoms: {
+                count: 100, // Changed from 500 to 100
+                radius: 1,
+            },
+            drawings: {
+                lines: false,
+                circle: false,
+                clusters: false,
+                background_color: '#000000',
+            },
+            export: {
+                image: () => {
+                    const imageDataURL = canvas.toDataURL({
+                        format: 'png',
+                        quality: 1
+                    });
+                    dataURL_downloader(imageDataURL);
+                },
+                video: () => {
+                    mediaRecorder.state == 'recording' ? mediaRecorder.stop() : mediaRecorder.start();
+                },
+            },
+            explore: true,
+            explorePeriod: 100,
+            rules: {},
+            rulesArray: [],
+            radii: {},
+            radii2Array: [],
+            colors: [],
+            numColors: 4,
+            time_scale: 1.0,
+            viscosity: 0.7,
+            gravity: 0.0,
+            pulseDuration: 10,
+            wallRepel: 40,
+            reset: () => {
+                randomAtoms(settings.atoms.count, true)
+            },
+            randomRules: () => {
+                settings.seed = local_seed;
+                startRandom();
+
+                showMessage(pickRandom(initializationMessages), 5000, () => {
+                    showMessage(defaultStatus);
+                });
+
+                settings.drawings.lines = true;
+                showMessage(pickRandom(drawLinesMessages), 5000, () => {
+                    settings.drawings.lines = false;
+                    showMessage(defaultStatus);
+                });
+
+                scheduleNextEvent();
+            },
+            symmetricRules: () => {
+                symmetricRules()
+                randomAtoms(settings.atoms.count, true)
+                updateGUIDisplay()
+            },
+            gui: null,
+        }
+
+        let eventTimeout = null;
+        let eventActiveTimeout = null;
+
+        function pickRandom(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function scheduleNextEvent() {
+            const delay = (Math.floor(Math.random() * (15 - 7 + 1)) + 7) * 1000;
+            eventTimeout = setTimeout(triggerEvent, delay);
+        }
+
+        function triggerEvent() {
+            const choice = Math.random() < 0.5 ? 'lines' : 'clusters';
+
+            if (choice === 'lines') {
+                settings.drawings.lines = true;
+                showMessage(pickRandom(drawLinesMessages), 7000, () => {
+                    settings.drawings.lines = false;
+                    showMessage(defaultStatus);
+                    scheduleNextEvent();
+                });
+            } else {
+                settings.drawings.clusters = true;
+                showMessage(pickRandom(trackingClustersMessages), 7000, () => {
+                    settings.drawings.clusters = false;
+                    showMessage(defaultStatus);
+                    scheduleNextEvent();
+                });
+            }
+        }
+
+        function showMessage(msg, duration = 0, callback = null) {
+            if (messageTimeout) clearTimeout(messageTimeout);
+
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.innerHTML = `<p>${msg}</p>`;
+
+            if (duration > 0) {
+                messageTimeout = setTimeout(() => {
+                    if (callback) {
+                        callback();
+                    } else {
+                        showMessage(defaultStatus);
+                    }
+                }, duration);
+            }
+        }
+
+        const setupClicks = () => {
+            canvas.addEventListener('click',
+                (e) => {
+                    pulse = settings.pulseDuration;
+                    if (e.shiftKey) pulse = -pulse;
+                    pulse_x = e.clientX;
+                    pulse_y = e.clientY;
+                }
+            )
+        }
+
+        const setupKeys = () => {
+            canvas.addEventListener('keydown',
+                function (e) {
+                    console.log(e.key)
+                    switch (e.key) {
+                        case 'r':
+                          settings.randomRules()
+                        break;
+                        case 't':
+                          settings.drawings.clusters = !settings.drawings.clusters
+                          if (settings.drawings.clusters) {
+                            showMessage(pickRandom(trackingClustersMessages), 7000, () => {
+                                settings.drawings.clusters = false;
+                                showMessage(defaultStatus);
+                            });
+                          } else {
+                            showMessage(defaultStatus);
+                          }
+                        break;
+                        case 'o':
+                          settings.reset()
+                          showMessage("Reset triggered.", 7000, () => {
+                              showMessage(defaultStatus);
+                          });
+                        break;
+                        default:
+                          console.log(e.key)
+                    }
+                })
+        }
+
+        const updateGUIDisplay = () => {
+            console.log('gui', settings.gui)
+            settings.gui.destroy()
+            setupGUI()
+        }
+
+        Object.defineProperty(String.prototype, 'capitalise', {
+            value: function() {
+                return this.charAt(0).toUpperCase() + this.slice(1);
+            },
+            enumerable: false
+        })
+
+        const setupGUI = () => {
+            settings.gui = new lil.GUI()
+            const configFolder = settings.gui.addFolder('Config')
+            configFolder.add(settings, 'reset').name('Reset')
+            configFolder.add(settings, 'randomRules').name('Cellaris Generate')
+            configFolder.add(settings, 'numColors', 1, 7, 1).name('Number of Colors')
+                .listen().onFinishChange(v => {
+                    setNumberOfColors();
+                    startRandom();
+                    showMessage("Number of Colors set to " + v, 7000, () => {
+                        showMessage(defaultStatus);
+                    });
+                })
+            configFolder.add(settings, 'seed').name('Seed').listen().onFinishChange(v => {
+                startRandom();
+                showMessage("Seed changed to " + v, 7000, () => {
+                    showMessage(defaultStatus);
+                });
+            })
+            configFolder.add(settings, 'fps').name('FPS - (Live)').listen().disable()
+            configFolder.add(settings.atoms, 'count', 1, 1000, 1).name('Atoms per-color').listen().onFinishChange(v => {
+                randomAtoms(v, true)
+                showMessage("Atoms per-color set to " + v, 7000, () => {
+                    showMessage(defaultStatus);
+                });
+            })
+            configFolder.add(settings, 'time_scale', 0.1, 5, 0.01).name('Time Scale').listen()
+            configFolder.add(settings, 'viscosity', 0.1, 2, 0.1).name('Viscosity').listen()
+            configFolder.add(settings, 'gravity', 0., 1., 0.05).name('Gravity').listen()
+            configFolder.add(settings, 'pulseDuration', 1, 100, 1).name('Click Pulse Duration').listen()
+            configFolder.add(settings, 'wallRepel', 0, 100, 1).name('Wall Repel').listen()
+            configFolder.add(settings, 'explore').name('Random Exploration').listen()
+
+            const drawingsFolder = settings.gui.addFolder('Drawings')
+            drawingsFolder.add(settings.atoms, 'radius', 1, 10, 0.5).name('Radius').listen()
+            drawingsFolder.add(settings.drawings, 'circle').name('Circle Shape').listen()
+            drawingsFolder.add(settings.drawings, 'clusters').name('Track Clusters').listen()
+            drawingsFolder.add(settings.drawings, 'lines').name('Draw Lines').listen()
+            drawingsFolder.addColor(settings.drawings, 'background_color').name('Background Color').listen()
+
+            const exportFolder = settings.gui.addFolder('Export')
+            exportFolder.add(settings.export, 'image').name('Image')
+            exportFolder.add(settings.export, 'video').name('Video: Start / stop')
+
+            for (const atomColor of settings.colors) {
+                const colorFolder =
+                    settings.gui.addFolder(`Rules: <font color='${atomColor}'>${atomColor.capitalise()}</font>`)
+                for (const ruleColor of settings.colors) {
+                    colorFolder.add(settings.rules[atomColor], ruleColor, -1, 1, 0.001)
+                         .name(`<-> <font color='${ruleColor}'>${ruleColor.capitalise()}</font>`)
+                         .listen().onFinishChange(v => { flattenRules() }
+                    )
+                }
+                colorFolder.add(settings.radii, atomColor, 1, maxRadius, 5).name('Radius')
+                    .listen().onFinishChange(v => { flattenRules() }
+                )
+            }
+        }
+
+        var local_seed = settings.seed;
+        function mulberry32() {
+            let t = local_seed += 0x6D2B79F5;
+            t = Math.imul(t ^ t >>> 15, t | 1);
+            t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+            return ((t ^ t >>> 14) >>> 0) / 4294967296.;
+        }
+
+        function loadSeedFromUrl() {
+            let hash = window.location.hash;
+            if (hash != undefined && hash[0] == '#') {
+                let param = Number(hash.substr(1));
+                if (isFinite(param)) {
+                    settings.seed = param;
+                    console.log("Using seed " + settings.seed);
+                }
+            }
+        }
+
+        function randomRules() {
+            if (!isFinite(settings.seed)) settings.seed = 0xcafecafe;
+            window.location.hash = "#" + settings.seed;
+            document.title = "Life #" + settings.seed;
+            local_seed = settings.seed;
+            for (const i of settings.colors) {
+                settings.rules[i] = {};
+                for (const j of settings.colors) {
+                    settings.rules[i][j] = mulberry32() * 2 - 1;
+                }
+                settings.radii[i] = 80;
+            }
+            flattenRules()
+        }
+
+        function symmetricRules() {
+            for (const i of settings.colors) {
+                for (const j of settings.colors) {
+                    if (j < i) {
+                        let v = 0.5 * (settings.rules[i][j] + settings.rules[j][i]);
+                        settings.rules[i][j] = settings.rules[j][i] = v;
+                    }
+                }
+            }
+            flattenRules()
+        }
+
+        function flattenRules() {
+            settings.rulesArray = []
+            settings.radii2Array = []
+            for (const c1 of settings.colors) {
+                for (const c2 of settings.colors) {
+                    settings.rulesArray.push(settings.rules[c1][c2])
+                }
+                settings.radii2Array.push(settings.radii[c1] * settings.radii[c1])
+            }
+        }
+
+        function updateCanvasDimensions() {
+            canvas.width = window.innerWidth * 0.9;
+            canvas.height = window.innerHeight * 0.9;
+        }
+
+        function randomX() {
+            return mulberry32() * (canvas.width - 100) + 50;
+        }
+
+        function randomY() {
+            return mulberry32() * (canvas.height - 100) + 50;
+        }
+
+        const atoms = []
+        function randomAtoms(number_of_atoms_per_color, clear_previous) {
+            if (clear_previous) atoms.length = 0;
+            for (let c = 0; c < settings.colors.length; c++) {
+                create(number_of_atoms_per_color, c)
+            }
+            clusters.length = 0;
+        }
+
+        function create(number, color) {
+            for (let i = 0; i < number; i++) {
+                atoms.push([randomX(), randomY(), 0, 0, color])
+            }
+        };
+
+        function startRandom() {
+            randomRules();
+            randomAtoms(settings.atoms.count, true);
+            updateGUIDisplay()
+            showMessage(pickRandom(initializationMessages), 5000, () => {
+                showMessage(pickRandom(initializationMessages), 5000, () => {
+                    showMessage(defaultStatus);
+                });
+            });
+        }
+
+        function setNumberOfColors() {
+            settings.colors = [];
+            for (let i = 0; i < settings.numColors; ++i) {
+                settings.colors.push(predefinedColors[i]);
+            }
+        }
+
+        loadSeedFromUrl()
+
+        const canvas = document.getElementById('canvas');
+        const m = canvas.getContext("2d");
+
+        function drawSquare(x, y, color, radius) {
+            m.save();
+            m.shadowColor = color;
+            m.shadowBlur = 15;
+            m.fillStyle = color;
+            m.fillRect(x - radius, y - radius, 2 * radius, 2 * radius);
+            m.restore();
+        }
+
+        function drawCircle(x, y, color, radius, fill = true) {
+            m.save();
+            m.shadowColor = color;
+            m.shadowBlur = 15;
+            m.beginPath();
+            m.arc(x, y, radius, 0, 2 * Math.PI);
+            m.closePath();
+            m.strokeStyle = m.fillStyle = color;
+            fill ? m.fill() : m.stroke()
+            m.restore();
+        }
+
+        function drawLineBetweenAtoms(ax, ay, bx, by, color) {
+            m.beginPath();
+            m.moveTo(ax, ay);
+            m.lineTo(bx, by);
+            m.closePath();
+            m.strokeStyle = color;
+            m.stroke();
+        }
+
+        let clusters = [];
+        function newCluster() {
+            return [randomX(), randomY(), maxRadius, 'white'];
+        }
+        function addNewClusters(num_clusters) {
+            if (clusters.length < num_clusters / 2) {
+                while (clusters.length < num_clusters) clusters.push(newCluster());
+            }
+        }
+        function findNearestCluster(x, y) {
+            let best = -1;
+            let best_d2 = 1.e38;
+            for (let i = 0; i < clusters.length; ++i) {
+                const c = clusters[i];
+                const dx = c[0] - x;
+                const dy = c[1] - y;
+                const d2 = dx * dx + dy * dy;
+                if (d2 < best_d2) {
+                    best = i;
+                    best_d2 = d2;
+                }
+            }
+            return [best, best_d2];
+        }
+        function moveClusters(accums) {
+            let max_d = 0.;
+            for (let i = 0; i < clusters.length; ++i) {
+                let c = clusters[i];
+                const a = accums[i];
+                if (a[0] > minClusterSize) {
+                    const norm = 1. / a[0];
+                    const new_x = a[1] * norm;
+                    const new_y = a[2] * norm;
+                    max_d = Math.max(max_d, Math.abs(c[0] - new_x), Math.abs(c[1] - new_y));
+                    c[0] = new_x;
+                    c[1] = new_y;
+                }
+            }
+            return max_d;
+        }
+        function finalizeClusters(accums) {
+            for (let i = 0; i < clusters.length; ++i) {
+                let c = clusters[i];
+                const a = accums[i];
+                if (a[0] > minClusterSize) {
+                    const norm = 1. / a[0];
+                    const new_r = 1.10 * Math.sqrt(a[3] * norm);
+                    c[2] = 0.95 * c[2] + 0.05 * new_r;
+                    c[3] = settings.colors[Math.floor(a[4] * norm + .5)];
+                } else {
+                    c[2] = 0.;
+                }
+            }
+        }
+        function trackClusters() {
+            addNewClusters(maxClusters);
+            let accums = [];
+            for (const c of clusters) accums.push([0, 0., 0., 0., 0]);
+            const maxKMeanPasses = 10;
+            for (let pass = maxKMeanPasses; pass >= 0; --pass) {
+                for (let i = 0; i < accums.length; i++) accums[i] = [0, 0., 0., 0., 0];
+                for (const c of atoms) {
+                    const [best, best_d2] = findNearestCluster(c[0], c[1]);
+                    if (best >= 0 && best_d2 < maxRadius * maxRadius) {
+                        accums[best][0] += 1;
+                        accums[best][1] += c[0];
+                        accums[best][2] += c[1];
+                        accums[best][3] += best_d2;
+                        accums[best][4] += c[4];
+                    }
+                }
+                const max_d = moveClusters(accums);
+                if (max_d < 1.) break;
+            }
+            finalizeClusters(accums);
+        }
+        function drawClusters() {
+            let i = 0;
+            while (i < clusters.length) {
+                let c = clusters[i];
+                if (c[2] > 0.) {
+                    drawCircle(c[0], c[1], c[3], c[2], false);
+                    ++i;
+                } else {
+                    const last = clusters.pop();
+                    if (i < clusters.length) clusters[i] = last;
+                }
+            }
+        }
+
+        updateCanvasDimensions()
+
+        var pulse = 0;
+        var pulse_x = 0,
+            pulse_y = 0;
+
+        var exploration_timer = 0;
+        function exploreParameters() {
+            if (exploration_timer <= 0) {
+                let c1 = settings.colors[Math.floor(mulberry32() * settings.numColors)];
+                if (mulberry32() >= 0.2) {
+                  let c2 = settings.colors[Math.floor(mulberry32() * settings.numColors)];
+                  let new_strength = mulberry32();
+                  if (settings.rules[c1][c2] > 0) new_strength = -new_strength;
+                  settings.rules[c1][c2] = new_strength;
+                } else {
+                  settings.radii[c1] = 1 + Math.floor(mulberry32() * maxRadius);
+                }
+                flattenRules();
+                exploration_timer = settings.explorePeriod;
+            }
+            exploration_timer -= 1;
+        }
+
+        var total_v;
+
+        const applyRules = () => {
+            total_v = 0.;
+            for (const a of atoms) {
+                let fx = 0;
+                let fy = 0;
+                const idx = a[4] * settings.numColors;
+                const r2 = settings.radii2Array[a[4]]
+                for (const b of atoms) {
+                    const g = settings.rulesArray[idx + b[4]];
+                    const dx = a[0] - b[0];
+                    const dy = a[1] - b[1];
+                    if (dx !== 0 || dy !== 0) {
+                        const d = dx * dx + dy * dy;
+                        if (d < r2) {
+                            const F = g / Math.sqrt(d);
+                            fx += F * dx;
+                            fy += F * dy;
+                            if (settings.drawings.lines) {
+                                drawLineBetweenAtoms(a[0], a[1], b[0], b[1], settings.colors[b[4]]);
+                            }
+                        }
+                    }
+                }
+                if (pulse != 0) {
+                    const dx = a[0] - pulse_x;
+                    const dy = a[1] - pulse_y;
+                    const d = dx * dx + dy * dy;
+                    if (d > 0) {
+                        const F = 100. * pulse / (d * settings.time_scale);
+                        fx += F * dx;
+                        fy += F * dy;
+                    }
+                }
+                if (settings.wallRepel > 0) {
+                  const d = settings.wallRepel
+                  const strength = 0.1
+                  if (a[0] <                d) fx += (d -                a[0]) * strength
+                  if (a[0] > canvas.width - d) fx += (canvas.width - d - a[0]) * strength
+                  if (a[1] <                 d) fy += (d                 - a[1]) * strength
+                  if (a[1] > canvas.height - d) fy += (canvas.height - d - a[1]) * strength
+                }
+                fy += settings.gravity;
+                const vmix = (1. - settings.viscosity);
+                a[2] = a[2] * vmix + fx * settings.time_scale;
+                a[3] = a[3] * vmix + fy * settings.time_scale;
+                total_v += Math.abs(a[2]);
+                total_v += Math.abs(a[3]);
+            }
+            for (const a of atoms) {
+                a[0] += a[2]
+                a[1] += a[3]
+
+                if (a[0] < 0) {
+                    a[0] = -a[0];
+                    a[2] *= -1;
+                }
+                if (a[0] >= canvas.width) {
+                    a[0] = 2 * canvas.width - a[0];
+                    a[2] *= -1;
+                }
+                if (a[1] < 0) {
+                    a[1] = -a[1];
+                    a[3] *= -1;
+                }
+                if (a[1] >= canvas.height) {
+                    a[1] = 2 * canvas.height - a[1];
+                    a[3] *= -1;
+                }
+            }
+            total_v /= atoms.length;
+        };
+
+        setNumberOfColors()
+        randomRules()
+
+        setupClicks()
+        setupKeys()
+        setupGUI()
+
+        var lastT = Date.now();
+        update();
+
+        function update() {
+            updateCanvasDimensions()
+            m.fillStyle = settings.drawings.background_color;
+            m.fillRect(0, 0, canvas.width, canvas.height);
+            applyRules();
+            for (const a of atoms) {
+                if (settings.drawings.circle) {
+                    drawCircle(a[0], a[1], settings.colors[a[4]], settings.atoms.radius);
+                } else {
+                    drawSquare(a[0], a[1], settings.colors[a[4]], settings.atoms.radius);
+                }
+            }
+            if (settings.drawings.clusters) {
+                trackClusters();
+                drawClusters();
+            }
+
+            updateParams();
+            requestAnimationFrame(update);
+        };
+
+        function updateParams() {
+            var curT = Date.now();
+            if (curT > lastT) {
+                const new_fps = 1000. / (curT - lastT);
+                settings.fps = Math.round(settings.fps * 0.8 + new_fps * 0.2)
+                lastT = curT;
+            }
+
+            if (total_v > 30. && settings.time_scale > 5.) settings.time_scale /= 1.1;
+            if (settings.time_scale < 0.9) settings.time_scale *= 1.01;
+            if (settings.time_scale > 1.1) settings.time_scale /= 1.01;
+
+            if (pulse != 0) pulse -= (pulse > 0) ? 1 : -1;
+            if (settings.explore) exploreParameters();
+        }
+
+        function dataURL_downloader(dataURL, name = `particle_life_${settings.seed}`) {
+            const hyperlink = document.createElement("a");
+            hyperlink.download = name;
+            hyperlink.target = '_blank';
+            hyperlink.href = dataURL;
+            hyperlink.click();
+            hyperlink.remove();
+        }
+
+        const videoStream = canvas.captureStream();
+        const mediaRecorder = new MediaRecorder(videoStream);
+        let chunks = [];
+        mediaRecorder.ondataavailable = function (e) {
+            chunks.push(e.data);
+        };
+        mediaRecorder.onstop = function (e) {
+            const blob = new Blob(chunks, { 'type': 'video/mp4' });
+            const videoDataURL = URL.createObjectURL(blob);
+            dataURL_downloader(videoDataURL);
+            chunks = [];
+        };
+    </script>
+
+</body>
+
+<!-- Mirrored from cellaris.wiki/wp-content/uploads/2024/12/cellarismobile.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 06 Dec 2024 22:52:41 GMT -->
+</html>
